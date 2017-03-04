@@ -1,6 +1,13 @@
 package HW7;
 
+import sun.plugin.cache.OldCacheEntry;
+
 import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class Main {
     public static void main(String[] args) {
@@ -33,6 +40,9 @@ public class Main {
                     new User(random.nextLong(), arrOfNames[i], arrOfSurnames[i], arrOfCities[i], random.nextInt()));
             list.add(order);
         }
+
+        //old way
+
         Collections.sort(list, new FirstComparator());
         System.out.println(list);
 
@@ -42,5 +52,55 @@ public class Main {
         Collections.sort(list, new ThirdComparator());
         System.out.println(list);
 
+        //new way
+
+        Collections.sort(list, (a, b) -> {
+            return b.getPrice() - a.getPrice();
+        });
+        System.out.println(list);
+
+        Collections.sort(list, ((o1, o2) -> {
+            if (o1.getPrice() - o2.getPrice() == 0) {
+                return o1.getUser().getCity().compareTo(o2.getUser().getCity());
+            }
+            return o1.getPrice() - o2.getPrice();
+        }));
+        System.out.println(list);
+
+        Collections.sort(list, ((o1, o2) -> {
+            if (o1.getItemName().compareTo(o2.getItemName()) == 0) {
+                if ((int) (o1.getId() - o2.getId()) == 0) {
+                    return o1.getUser().getCity().compareTo(o2.getUser().getCity());
+                }
+                return (int) (o1.getId() - o2.getId());
+            }
+
+            return o1.getItemName().compareTo(o2.getItemName());
+        }));
+        System.out.println(list);
+
+        // + other tasks from HW9
+
+        List<Order> uniqueOrders = list.stream().
+                distinct().
+                collect(Collectors.toCollection(ArrayList::new));
+
+        List<Order> expensiveOrders = list.stream().
+                filter(order -> order.getPrice() >= 1500).
+                collect(Collectors.toCollection(ArrayList::new));
+
+        List<List<Order>> listOfTwoCurrencies = splitByCurrency(list);
+
     }
+
+    private static List<List<Order>> splitByCurrency(List<Order> input){
+        List<List<Order>> listOfCurr = new ArrayList<>();
+
+        listOfCurr.add(input.stream().filter(order -> order.getCurrency().equals(Currency.getInstance("USD"))).collect(Collectors.toList()));
+        listOfCurr.add(input.stream().filter(order -> order.getCurrency().equals(Currency.getInstance("UAH"))).collect(Collectors.toList()));
+
+        return listOfCurr;
+    }
+
+
 }

@@ -1,6 +1,7 @@
 package HW7;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MainForThirdTask {
     public static void main(String[] args) {
@@ -33,20 +34,26 @@ public class MainForThirdTask {
         System.out.println(treeSet.toArray()[0].toString());
 
         System.out.print("check if set contain Order where User’s lastName is - “Petrov”: ");
+
+        System.out.println(treeSet.stream().anyMatch(order -> order.getUser().getLastName().equals("Petrov")));
         System.out.println(findPetrov(treeSet));
 
-        Iterator itr = treeSet.iterator();
+        TreeSet<Order> set = treeSet.stream().filter(order -> !order.getCurrency().equals(Currency.getInstance("USD"))).collect(Collectors.toCollection(TreeSet::new));
+
+        /*Iterator itr = treeSet.iterator();
         while (itr.hasNext()){
             Object element = itr.next();
             Order order = (Order) element;
             if (order.getCurrency().equals(Currency.getInstance("USD"))){
                 itr.remove();
             }
-        }
+        }*/
 
         System.out.println("delete orders where currency is USD using Iterator: ");
-        System.out.println(Arrays.toString(treeSet.toArray()));
+        System.out.println(Arrays.toString(set.toArray()));
         }
+
+
 
         static boolean findPetrov(Set<Order> set) {
             for (Order o : set) {
